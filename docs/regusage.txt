@@ -1,0 +1,356 @@
+Microinstruction Summary
+
+Fields:
+		0-4	RSELECT
+		5-8	ALUF
+		9-11	BS
+		12-15	F1*
+		16-19	F2*
+		20	LOAD T
+		21	LOAD L & M*
+		22-31	NEXT
+
+			* High-order bit complemented in RDRAM and WRTRAM
+
+ALUF:
+		0:	BUS			4: BUS XOR T	10: BUS - T		14: BUS . T*
+		1:	T			5: BUS + 1*	11: BUS - T -1		15: BUS AND NOT T
+		2:	BUS OR T*		6: BUS -1*	12: BUS + T +1*		16: --undef--
+		3:	BUS AND T		7: BUS +T	13: BUS + SKIP*		17: --undef--
+		* Loads T from ALU output
+
+BUS SOURCE (standard):
+		0:	<-RLOCATION		4: (task specific)
+		1:	RLOCATION<-		5: <-MD
+		2:	None(BUS<- -1)		6: <-MOUSE
+		3:	(task specific)		7: <-DISP
+
+BUS SOURCE (task-specific):
+		0 (cpu)		4,16 (ksec,kwd)	7 (ether)	ram related
+		3: <-SLOCATION	<-KSTAT		-		<-SLOCATION
+		4: SLOCATION<-	<-KDATA		EIDFCT		SLOCATION<-
+		
+F1 (standard)
+		0: -				4:	<-L LSH 1
+		1: MAR<-			5:	<-L RSH 1
+		2: TASK				6:	<-L LCY 8
+		3: BLOCK			7:	<-CONSTANT
+
+
+F1 (task-specific)
+	0		4,16		7	11	12	13		14
+F1:	cpu		ksec,kwd	ether	dwt	curt	dht		dvt		ram related
+==============================================================================================================
+10:	SWMODE		-		-	-	-	-		-		(SWMODE)
+11:	WRTRAM		STROBE		-	-	-	-		-		WRTRAM
+12:	RDRAM		KSTAT<-		-	-	-	-		-		RDRAM
+13:	RMR<-		INCRECNO	ELFCT	-	-	-		-		SRB<-
+14:	-		CLRSTAT		EPFCT	-	-	-		-		-
+15:	ESRB<-		KCOMM<-		EWFCT	-	-	-		-		-
+16:	RSNF		KADR<-		-	-	-	-		-		-
+17:	STARTF		KDATA<-		-	-	-	-		-		-
+
+F2 (standard)
+		0: -				4:	BUS
+		1: BUS = 0			5:	ALUCY
+		2: SH < 0			6:	MD<-
+		3: SH = 0			7:	<-CONSTANT
+
+F2 (task-specific)
+
+	0		4,16		7	11	12	13		14
+F2:	cpu		ksec,kwd	ether	dwt	curt	dht		dvt		ram related
+==============================================================================================================
+10:	BUSODD		INIT		EODFCT	DDR<-	XPREG<-	EVENFIELD	EVENFIELD	-
+11:	MAGIC		RWC		EOSFCT	-	CSR<-	SETMODE		-		-
+12:	DNS<-		RECNO		ERBFCT	-	-	-		-		-
+13:	ACDEST		XFRDAT		EEFCT	-	-	-		-		-
+14:	IR<-		SWRNRDY		EBFCT	-	-	-		-		-
+15:	IDISP		NFER		ECBFCT	-	-	-		-		-
+16:	ACSOURCE	STROBON		EISFCT	-	-	-		-		-
+17:	-		-		-	-	-	-		-		-
+
+R Registers R0  - R37
+S Registers R40 - R77
+
+NOVA Emulator
+-------------
+
+R0		AC3
+R1		AC2
+R2		AC1
+R3		AC0
+R4		NWW
+R5		SAD
+R6		PC
+R7		XREG
+R10		XH
+
+R35		DWAX
+R36		SWA
+R40		LREG
+R41		NLINES
+R42		RAST1
+R43		SRCX
+R44		SRCY
+R45		CONST
+R46		HCNT
+R47		HINC
+R50		NWORDS
+R51		MASK2
+
+model 31 disc
+-------------
+
+R31		xKWDCT
+R32		xCKSUMR
+R33		xKNMAR
+R34		xDCBR
+
+display
+-------
+
+R20		CURX
+R21		CURDATA
+R22		xCBA
+R23		xAECL
+R24		xSLC
+R25		xMTEMP
+R26		xHTAB
+R27		xYPOS
+R30		xDWA
+
+ethernet
+--------
+
+R12		xECNTR
+R13		xEPNTR
+
+memory refresh
+--------------
+
+R11		xCLOCKTEMP
+R37		xR37
+
+audio (obsolete)
+----------------
+
+R71		xAudioWdCt
+R72		xAudioData
+
+
+-- registers used by Mesa emulator
+; R registers
+
+R35		temp			(also used by bitblt)
+R36		temp2			(also used by bitblt)
+R15		mpc			Mesa PC
+R16		stkp			stack pointer [0-10] 0 empty, 10 full
+R17		XTSreg			xfer trap state
+
+R0		brkbyte			(AC3) bytecode to execute after breakpoint
+R1		mx			(AC2) x register for XFER
+R2		saveret			(AC1) r-temporary for return indices and values
+R3		newfield		(AC0) new field bits for WF and friends
+
+R5		count			scratch R register for counting
+R7		taskhole		pigeonhole for saving things across TASKs
+
+R10		ib			instruction byte
+R37		clockreg		low order bits of real time clock
+
+; S registers, can't shift into them, BUS not zero while storing.
+
+R51		my			y register for XFER
+R52		lp			local pointer
+R53		gp			global pointer
+R54		cp			code pointer
+R55		ATPreg			allocation trap parameter
+R56		OTPreg			other trap parameter
+R57		XTPreg			xfer trap parameter
+R70		wdc			wakeup disable counter
+
+; Mesa evaluation stack
+
+R60		stk0			stack (bottom)
+R61		stk1
+R62		stk2
+R63		stk3
+R64		stk4
+R65		stk5
+R66		stk6
+R67		stk7			stack (top)
+
+; Miscellaneous S registers
+
+R41		mask			used by string instructions
+R42		unused1			not safe across call to BITBLT
+R43		unused2			not safe across call to BITBLT
+R44		alpha			alpha byte (among other things)
+R45		index			frame size index (among other things)
+R46		entry			allocation table entry address (among other things)
+R47		frame			allocated frame pointer (among other things)
+R41		righthalf		right 4 bits of alpha or beta
+R45		lefthalf		left 4 bits of alpha or beta
+R50		unused3			not safe across call to BITBLT
+
+
+Reserved memory locations
+
+location		name		contents
+
+Page 0:
+
+0-17					Set to 77400B by OS (Swat)
+
+Page 1:
+
+400-412					Used by standard bootstrap operation
+420			DASTART		Display list header (Std. Microcode)
+421			-		Display vertical field interrupt bitword (Std Microcode)
+422			ITQUAN		Interval timer stored quantitiy (Std. Microcode)
+423			ITBITS		Interval timer bitword 	(Std. Microcode)
+424			MOUSEX		Mouse X coordinate (Std. Microcode)
+425			MOUSEY		Mouse Y coordinate (Std. Microcode)
+426			CURSORX		Cursor X coordinate (Std. Microcode)
+427			CURSORY		Cursor Y coordinate (Std. Microcode)
+430			RTC		Real Time Clock (Std. Microcode)
+431-450			CURMAP		Cursor bitmap (Std. Microcode)
+452			WW		Interrupt wakeups waiting (Std. Microcode)
+453			ACTIVE		Active interrupt bitword (Std. Microcode)
+457			-		Zero (Extension of MASKTAB by convention; set by OS)
+460-477			MASKTAB		Mask table for convert (Std. Microcode; set by OS)
+500			PCLOC		Saved interrupt PC (Std. Microcode)
+501-517			INTVEC		Interrupt Transfer Vector (Std. Microcode)
+
+521			KBLK		Disk command block address (Std. Microcode)
+522			KSTAT		Disk status at start of current sector (Std. Microcode)
+523			KADDR		Disk address of latest disk command (Std. Microcode)
+524			-		Sector interrupt bit mask (Std. Microcode)
+
+525			ITTIME		Interval timer time (Std. Microcode)
+527			TRAPPC		Trap saved PC (Std. Microcode)
+
+530-567			TRAPVEC		Trap Vector (Std. Microcode)
+
+570-577			-		Timer data (OS)
+600			EPLOC		Ethernet post location (Std. Microcode)
+601			EBLOC		Ethernet interrupt bit mask (Std. Microcode)
+602			EELOC		Ethernet ending count (Std. Microcode)
+603			ELLOC		Ethernet load location (Std. Microcode)
+604			EICLOC		Ethernet input buffer count (Std. Microcode)
+605			EIPLOC		Ethernet input buffer pointer (Std. Microcode)
+606			EOCLOC		Ethernet output buffer count (Std. Microcode)
+607			EOPLOC		Ethernet output buffer pointer (Std. Microcode)
+610			EHLOC		Ethernet host address (Std. Microcode)
+611-612			-		Reserved for Ethernet expansion (Std. Microcode)
+613			-		Alto I/II indication that microcode can interrogate (0=Alto, -1=AltoII)
+614			DCBR		Posted by parity task when a main memory parity error is detected
+615			KNMAR		"" (Std. Microcode)
+616			DWA		"" (Std. Microcode)
+617			CBA		"" (Std. Microcode)
+620			PC		"" (Std. Microcode)
+621			SAD		"" (Std. Microcode)
+
+(Note: Disk and Ethernet bootstrap loaders run in 622-777)
+
+700-707			-		Saved registers (Swat)
+
+Page 376B:
+
+177016 - 177017		UTILOUT		Printer output (Std. Hardware)
+177020 - 177023		XBUS		Utility input bus (Alto II Std. Hardware)
+177024			MEAR		Memory Error Address Register (Alto II Std. Hardware)
+177025			MESR		Memory error status register (Alto II Std. Hardware)
+177026			MECR		Memory error control register (Alto II Std. Hardware)
+177030 - 177033		UTILIN		Printer status, mouse, keyset (all 4 locations return same thing)
+177034 - 177037		KBDAD		Undecoded keyboard (Std. Hardware)
+
+Page 377B:
+
+177740 - 177757		BANKREGS	Extended memory option bank registers
+
+PARC / SDD Reserved Locations
+
+Page 0:
+
+451			-		Color map pointer
+456			-		Mesa disaster flag
+526			-		SmallTalk trap exit instruction
+622			-		Tape control block list
+630 - 640		-		Second Ethernet control block
+631 - 661		-		Hexadecimal floating-point microcode
+
+640 - 644		-		Trident disk control block
+					640 = pointer to first disk command block
+					641 = number of currently selected drive
+					642 = cylinder position used for the last command
+					643 = status of current drive at last sector pulse
+					644 = error which caused the last transfer to be aborted
+									
+640 - 651		-		Third Ethernet control block
+720 - 777		-		SLOT devices
+776 - 777		-		Music
+
+Page 376B:
+
+177100			-		Sumagraphics tablet X
+177101			-		Sumagraphics tablet Y
+177140 - 177157		-		Organ keyboard
+177200 - 177204		-		PROM programmer
+177234 - 177237		-		Experimental ursor control
+177240 - 177257		-		Alto II debugger
+177244 - 177247		-		Graphics keyboard
+
+Page 377B:
+
+177400 - 177405		-		Maxc2 maintenance interface
+177400			-		Alto DLS input
+177420			-		""
+177440			-		""
+177460			-		""
+177600 - 177677		-		Alto DLS output
+177700			-		EIA interface output bit
+177701			EIALOC		EIA interface input bit
+177720 - 177737		-		TV Camera Interface
+177764 - 177773		-		Redactron tape drive
+177776			-		Digital-Analog Converter
+177776			-		Digital-Analog Converter, Joystick
+177777			-		Digital-Analog Converter, Joystick
+
+S-Group Instruction Summary
+
+Opcode		Trap Location		Name
+60000 - 60377	--			CYCLE
+60400 - 60777	531			RAM trap
+61000 - 61377	532			Parameterless opcodes to 61026, ROM trap for rest
+61400 - 61777	533			RAM trap
+62000 - 62377	534			RAM trap
+62400 - 62777	535			RAM trap
+63000 - 63377	536			RAM trap
+63400 - 63777	536			RAM trap
+64000 - 64377	537			RAM trap
+64400 - 64777	--			JSRII
+65000 - 65377	--			JSRIS
+65400 - 65777	543			RAM trap
+66000 - 66377	544			RAM trap
+66400 - 66777	545			RAM trap
+67000 - 67377	--			CONVERT
+67400 - 67777	547			RAM trap
+70000 - 70377	550			RAM trap
+70400 - 70777	551			RAM trap
+71000 - 71377	552			RAM trap
+71400 - 71777	553			RAM trap
+72000 - 72377	554			RAM trap
+72400 - 72777	555			RAM trap
+73000 - 73377	556			RAM trap
+73400 - 73777	557			RAM trap
+74000 - 74377	560			RAM trap
+74400 - 74777	561			RAM trap
+75000 - 75377	562			RAM trap
+75400 - 75777	563			RAM trap
+76000 - 76377	564			RAM trap
+76400 - 76777	565			RAM trap
+77000 - 77377	566			RAM trap
+77400 - 77777	567			RAM trap
+
