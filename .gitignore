@@ -12,7 +12,8 @@
 *.exe
 *.out
 
-
+bin/
+obj/
 
 *.kate-swp
 *~
