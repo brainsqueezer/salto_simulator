@@ -18,3 +18,9 @@ obj/
 *.kate-swp
 *~
 
+# temporary files
+alto.mng
+asm/helloworld.lst
+keyboard.conf
+temp/
+

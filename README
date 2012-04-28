@@ -7,6 +7,9 @@ Partially based on info found in Eric Smith's Alto simulator: Altogether.
 
 Things you need before you can give it a try.
 
+
+
+
 1.1) Prerequisites
 =================================
 
@@ -14,13 +17,24 @@ You need the GNU compiler collection. SALTO was developed and tested with
 GCC 3.3.3, while others should work. You also need GNU make.
 Both can be found at http://www.fsf.org/
 
+apt-get install build-essential
+
+
 You also need SDL - Simple Direct Media Layer - installed, and "sdl-config"
 in your path. It is used to determine the required compiler switches and
 the path to the SDL libraries. SDL can be found at http://libsdl.org/
 
+apt-get install libsdl1.2-dev
+
+
 Some build tools are required, such as (g)make, ar, ranlib, flex, yacc.
 You should have these ready, if you installed the GNU binutils, and if
 you installed the flex and yacc lexer and parser generators.
+
+apt-get install flex bison
+
+
+
 
 1.2) Settings
 =================================
@@ -32,13 +46,17 @@ choose DEBUG=0, which removes all the logprintf calls from the code and
 makes it a lot smaller and faster.
 
 
+
+
 2.) Running
 =================================
 
 After building a binary by running "make" or "gmake" on the command line,
 and assuming all went wll, you can now run
-	bin/salto games.dsk.Z
-if you have the games.dsk.Z image available.
+
+	bin/salto disks/games.dsk.Z
+
+
 
 
 2.1) Running the debug build
@@ -128,7 +146,9 @@ a file:
 	bin/salto -all +dwt +dsp -d helloworld.bin >hw.log
 
 
-2.1) Running the normal build
+
+
+2.2) Running the normal build
 =================================
 
 The only thing you can specify on the command line is the name of a
@@ -137,3 +157,21 @@ there are still bugs to find in the disk drive selection emulation.
 
 You can toggle to the debugger window with "scroll lock", and
 you can inspect memory just like described above.
+
+
+
+
+
+2.3) Included disks
+=================================
+bcpl.dsk.Z
+diag.dsk.Z
+gamesb.dsk.Z
+games.dsk.Z
+nonprog.dsk.Z
+st76boot.dsk.Z
+tdisk4.dsk.Z
+tdisk8.bin
+
+
+
