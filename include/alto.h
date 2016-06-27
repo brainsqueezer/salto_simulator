@@ -22,6 +22,9 @@
  *
  * $Id: alto.h,v 1.1.1.1 2008/07/22 19:02:07 pm Exp $
  *****************************************************************************/
+
+#include <stdlib.h>
+
 #if !defined(_ALTO_H_INCLUDED_)
 #define	_ALTO_H_INCLUDED_
 
